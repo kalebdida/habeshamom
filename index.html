@@ -204,7 +204,13 @@
     flex: 1; min-width: 200px; font: inherit; padding: 8px 12px;
     border-radius: 10px; border: 2px solid var(--coffee-2); background: #fff;
   }
-  #keyStatus { margin: 8px 0 0; }
+  #keyStatus, #addisStatus { margin: 8px 0 0; }
+  .key-row select, .toolbar select {
+    font: inherit; padding: 6px 10px; border-radius: 10px; border: 2px solid var(--coffee-2); background: #fff; color: var(--ink);
+  }
+  .set-h { margin: 16px 0 0; font-weight: bold; color: var(--coffee); }
+  .am { margin-top: 8px; padding-top: 8px; border-top: 1px dashed var(--gold); font-size: .85em; color: var(--coffee-2); }
+  .small-btn:disabled { opacity: .6; cursor: wait; }
 
   /* Slipper */
   .slipper {
@@ -300,6 +306,13 @@
       <button class="confess" id="confessBtn" type="submit">Confess to Mom <svg class="ic" aria-hidden="true"><use href="#i-pray"/></svg></button>
     </form>
     <div class="toolbar">
+      <label>Mom is talking to
+        <select id="who" aria-label="Who is confessing">
+          <option value="">my child</option>
+          <option value="son">my son</option>
+          <option value="daughter">my daughter</option>
+        </select>
+      </label>
       <label><input type="checkbox" id="autoSpeak"> <svg class="ic" aria-hidden="true"><use href="#i-speak"/></svg> Auto-speak mom's reply</label>
       <button class="small-btn" id="clearBtn" type="button"><svg class="ic" aria-hidden="true"><use href="#i-trash"/></svg> Clear chat</button>
     </div>
@@ -307,14 +320,26 @@
 
   <section class="card">
     <details id="settings">
-      <summary><svg class="ic" aria-hidden="true"><use href="#i-gear"/></svg> Settings (Gemini API key)</summary>
+      <summary><svg class="ic" aria-hidden="true"><use href="#i-gear"/></svg> Settings (API keys)</summary>
+      <p class="set-h">Gemini key (mom's brain)</p>
       <div class="key-row">
         <input type="password" id="keyInput" placeholder="Paste your Gemini API key" autocomplete="off" aria-label="Gemini API key">
         <button class="small-btn" id="saveKey" type="button">Save</button>
         <button class="small-btn" id="removeKey" type="button">Remove</button>
       </div>
       <p id="keyStatus"></p>
-      <p>The key stays in this browser only (localStorage). Without a key, offline mom answers.</p>
+      <p class="set-h">Addis AI key (mom's Amharic voice)</p>
+      <div class="key-row">
+        <input type="password" id="addisInput" placeholder="Paste your Addis AI API key" autocomplete="off" aria-label="Addis AI API key">
+        <button class="small-btn" id="saveAddis" type="button">Save</button>
+        <button class="small-btn" id="removeAddis" type="button">Remove</button>
+      </div>
+      <div class="key-row">
+        <label>Voice <select id="voiceSel" aria-label="Amharic voice"></select></label>
+        <button class="small-btn" id="testVoice" type="button">Test voice</button>
+      </div>
+      <p id="addisStatus"></p>
+      <p>Keys stay in this browser only (localStorage). Without a Gemini key, offline mom answers. Without an Addis AI key, the browser's English voice reads the reply.</p>
     </details>
   </section>
 </main>
@@ -327,6 +352,16 @@ const MODEL = "gemini-2.5-flash";
 const API_TIMEOUT_MS = 8000;
 const KEY_STORAGE = "habeshaMomGeminiKey";
 const SPEAK_STORAGE = "habeshaMomAutoSpeak";
+
+// Addis AI (Amharic voice). Change the default voice here.
+const ADDIS_URL = "https://api.addisassistant.com/api/v1/voice/generations";
+const ADDIS_DEFAULT_VOICE = "am-makda";
+const ADDIS_VOICES = ["am-makda", "am-meron", "am-feven", "am-melat", "am-dibora", "am-sara", "am-nejat", "am-loza",
+  "am-hamen", "am-simon", "am-yohanes-calm", "am-tesfa", "am-muaz", "am-roba", "am-nahom", "am-amanuel",
+  "am-tewodros", "am-kaleb", "am-dawit"];
+const ADDIS_TIMEOUT_MS = 30000;
+const ADDIS_KEY_STORAGE = "habeshaMomAddisKey";
+const ADDIS_VOICE_STORAGE = "habeshaMomAddisVoice";
 
 const SYSTEM_PROMPT = `You are a loving but extremely dramatic Ethiopian mother. Your child has just confessed something to you. React like a real Habesha mom.
 
@@ -355,7 +390,8 @@ Rules:
 - Roast their CHOICES, never their body, looks, ethnicity, region, or religion.
 - No profanity or slurs. Be savage about what they DID, never about who they ARE.
 - If the confession sounds genuinely serious (self-harm, abuse, crisis), drop the comedy completely, respond with real warmth, and gently encourage them to talk to someone they trust. Set disappointment to 0.
-- Return ONLY JSON: {"reply": "...", "disappointment": 0-100, "slipper": true/false}. Use slipper: true only for truly outrageous confessions.`;
+- Also write "reply_am": the same reply said the way a real mother in Addis Ababa would say it out loud, in natural, fluent, everyday Amharic in Ge'ez script. It will be read by an Amharic voice, so it must sound native, not translated: no Latin letters, no emojis, numbers written as Amharic words. Use masculine forms for a son and feminine forms for a daughter.
+- Return ONLY JSON: {"reply": "...", "reply_am": "...", "disappointment": 0-100, "slipper": true/false}. Use slipper: true only for truly outrageous confessions.`;
 
 const PRESETS = [
   "I failed my math exam",
@@ -437,6 +473,7 @@ function storeSet(k, v) { try { localStorage.setItem(k, v); return true; } catch
 function storeDel(k) { try { localStorage.removeItem(k); } catch (e) {} }
 
 let apiKey = storeGet(KEY_STORAGE);
+let addisKey = storeGet(ADDIS_KEY_STORAGE);
 
 // ====== GEMINI ======
 function parseMomJson(raw) {
@@ -451,7 +488,13 @@ function parseMomJson(raw) {
   let d = Number(obj.disappointment);
   if (!isFinite(d)) d = 50;
   d = Math.max(0, Math.min(100, Math.round(d)));
-  return { reply: obj.reply.trim(), disappointment: d, slipper: obj.slipper === true, offline: false };
+  const am = typeof obj.reply_am === "string" ? obj.reply_am.trim() : "";
+  return { reply: obj.reply.trim(), am: am, disappointment: d, slipper: obj.slipper === true, offline: false };
+}
+
+function whoPrefix() {
+  const w = $("who").value;
+  return w ? "(The child confessing is your " + w + ".) " : "";
 }
 
 async function askGemini(text) {
@@ -466,7 +509,7 @@ async function askGemini(text) {
       signal: controller.signal,
       body: JSON.stringify({
         systemInstruction: { parts: [{ text: SYSTEM_PROMPT }] },
-        contents: [{ role: "user", parts: [{ text: text }] }],
+        contents: [{ role: "user", parts: [{ text: whoPrefix() + text }] }],
         generationConfig: { responseMimeType: "application/json", temperature: 1.1 }
       })
     });
@@ -549,7 +592,7 @@ function throwSlipper() {
   setTimeout(() => app.classList.add("shake"), 450);
 }
 
-function speak(text) {
+function browserSpeak(text) {
   if (!("speechSynthesis" in window)) return;
   try {
     window.speechSynthesis.cancel();
@@ -560,6 +603,79 @@ function speak(text) {
     u.lang = "en-US";
     window.speechSynthesis.speak(u);
   } catch (e) {}
+}
+
+// ---- Addis AI Amharic voice ----
+const audioCache = new Map();   // Amharic text + voice -> audio URL
+let currentAudio = null;
+let speakToken = 0;
+
+function stopSpeaking() {
+  speakToken++;
+  if (currentAudio) { try { currentAudio.pause(); } catch (e) {} currentAudio = null; }
+  if ("speechSynthesis" in window) { try { window.speechSynthesis.cancel(); } catch (e) {} }
+}
+
+function ulid() {
+  const A = "0123456789ABCDEFGHJKMNPQRSTVWXYZ";
+  let t = Date.now(), out = "";
+  for (let i = 0; i < 10; i++) { out = A[t % 32] + out; t = Math.floor(t / 32); }
+  for (let i = 0; i < 16; i++) out += A[Math.floor(Math.random() * 32)];
+  return out;
+}
+
+async function addisAudioUrl(text) {
+  const voice = $("voiceSel").value || ADDIS_DEFAULT_VOICE;
+  const cacheKey = voice + "|" + text;
+  if (audioCache.has(cacheKey)) return audioCache.get(cacheKey);
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), ADDIS_TIMEOUT_MS);
+  try {
+    const res = await fetch(ADDIS_URL, {
+      method: "POST",
+      headers: { "Content-Type": "application/json", "Accept": "application/json", "x-api-key": addisKey },
+      signal: controller.signal,
+      body: JSON.stringify({
+        text: text, language: "am", voice_id: voice, output_format: "mp3_44100",
+        stream: false, client_request_id: ulid()
+      })
+    });
+    if (!res.ok) throw new Error("Addis AI HTTP " + res.status);
+    const body = await res.json();
+    const d = body && typeof body === "object" && body.data ? body.data : body;
+    const url = d && (d.audio_url || (d.playback && d.playback.url));
+    if (!url) throw new Error("Addis AI returned no audio");
+    audioCache.set(cacheKey, url);
+    return url;
+  } finally {
+    clearTimeout(timer);
+  }
+}
+
+// Speaks Amharic with Addis AI when possible, otherwise the browser's English voice.
+// Returns "addis" or "browser" so callers can show what happened.
+async function speak(text, am, btn) {
+  stopSpeaking();
+  const token = speakToken;
+  if (addisKey && am) {
+    const old = btn ? btn.innerHTML : "";
+    if (btn) { btn.disabled = true; btn.textContent = "Mom is clearing her throat..."; }
+    try {
+      const url = await addisAudioUrl(am);
+      if (token !== speakToken) return "cancelled";
+      const audio = new Audio(url);
+      currentAudio = audio;
+      await audio.play();
+      return "addis";
+    } catch (e) {
+      console.warn("Amharic voice failed, using browser voice:", e && e.message);
+      if (token !== speakToken) return "cancelled";
+    } finally {
+      if (btn) { btn.disabled = false; btn.innerHTML = old; }
+    }
+  }
+  browserSpeak(text);
+  return "browser";
 }
 
 function setBusy(b) {
@@ -601,7 +717,7 @@ async function confess(text) {
   setMeter(result.disappointment);
   if (window.bg3d) window.bg3d.burst(.7);
   if (result.slipper || result.disappointment >= 90) throwSlipper();
-  if ($("autoSpeak").checked) speak(result.reply);
+  if ($("autoSpeak").checked) speak(result.reply, result.am);
   await new Promise(done => {
     let n = 0;
     const tm = setInterval(() => {
@@ -612,13 +728,20 @@ async function confess(text) {
     }, 16);
   });
 
+  if (result.am) {
+    const amEl = document.createElement("div");
+    amEl.className = "am";
+    amEl.lang = "am";
+    amEl.textContent = result.am;
+    bubble.appendChild(amEl);
+  }
   const tools = document.createElement("div");
   tools.className = "bubble-tools";
   const sp = document.createElement("button");
   sp.type = "button";
   sp.className = "small-btn";
-  sp.innerHTML = ic("speak") + " Read it out loud";
-  sp.addEventListener("click", () => speak(result.reply));
+  sp.innerHTML = ic("speak") + (addisKey && result.am ? " Hear mom in Amharic" : " Read it out loud");
+  sp.addEventListener("click", () => speak(result.reply, result.am, sp));
   tools.appendChild(sp);
   if (result.offline) {
     const b = document.createElement("span");
@@ -715,7 +838,7 @@ input.addEventListener("keydown", e => {
 });
 
 $("clearBtn").addEventListener("click", () => {
-  if ("speechSynthesis" in window) { try { window.speechSynthesis.cancel(); } catch (e) {} }
+  stopSpeaking();
   chat.textContent = "";
   const p = document.createElement("p");
   p.className = "empty";
@@ -745,6 +868,43 @@ $("removeKey").addEventListener("click", () => {
   $("keyInput").value = "";
   showKeyStatus();
 });
+// Addis AI voice settings
+function showAddisStatus(note) {
+  $("addisStatus").textContent = note || (addisKey
+    ? "Key saved. Mom speaks Amharic for live replies."
+    : "No key. The browser's English voice is used.");
+}
+ADDIS_VOICES.forEach(v => {
+  const o = document.createElement("option");
+  o.value = v;
+  o.textContent = v.replace(/^am-/, "");
+  $("voiceSel").appendChild(o);
+});
+$("voiceSel").value = ADDIS_VOICES.includes(storeGet(ADDIS_VOICE_STORAGE)) ? storeGet(ADDIS_VOICE_STORAGE) : ADDIS_DEFAULT_VOICE;
+$("voiceSel").addEventListener("change", e => storeSet(ADDIS_VOICE_STORAGE, e.target.value));
+$("saveAddis").addEventListener("click", () => {
+  const v = $("addisInput").value.trim();
+  if (!v) { showAddisStatus("Paste a key first, yene lij."); return; }
+  addisKey = v;
+  const ok = storeSet(ADDIS_KEY_STORAGE, v);
+  $("addisInput").value = "";
+  showAddisStatus(ok ? "" : "Key set for this session (browser storage is blocked).");
+});
+$("removeAddis").addEventListener("click", () => {
+  addisKey = "";
+  storeDel(ADDIS_KEY_STORAGE);
+  $("addisInput").value = "";
+  showAddisStatus();
+});
+$("testVoice").addEventListener("click", async () => {
+  if (!addisKey) { showAddisStatus("Save an Addis AI key first."); return; }
+  showAddisStatus("Asking mom to say something...");
+  const how = await speak("My child, the food is ready.", "ወይ ጉድ! የኔ ልጅ፣ ምግቡ ቀርቧል።", $("testVoice"));
+  showAddisStatus(how === "addis" ? "Amharic voice works." :
+    how === "browser" ? "Amharic voice failed, so the browser voice was used. Check the key, your credits, or try another voice." : "");
+});
+showAddisStatus();
+
 $("autoSpeak").checked = storeGet(SPEAK_STORAGE) === "1";
 $("autoSpeak").addEventListener("change", e => storeSet(SPEAK_STORAGE, e.target.checked ? "1" : "0"));
 showKeyStatus();

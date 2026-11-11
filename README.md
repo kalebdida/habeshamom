@@ -20,8 +20,10 @@ It is a comedy app, and it is also a small demonstration that persona design, co
 - **Chat display** with mom's replies in Amharic-English code-switching (Amharic written in Latin letters so any audience can follow)
 - **Disappointment Meter**: an animated 0-100% bar, from "Proud mom 🥹" to "SLIPPER INCOMING 🩴"
 - **Flying slipper**: a spinning 🩴 crosses the screen with a screen shake for truly outrageous confessions
-- **Read it out loud**: browser text-to-speech, with an auto-speak toggle for stage demos
-- **Structured AI output**: the model returns JSON (`reply`, `disappointment`, `slipper`) that drives the whole UI
+- **Real Amharic voice**: mom's reply is spoken in Amharic by an Ethiopian-built voice model (Addis AI), with the Amharic text shown under the English. Falls back to browser text-to-speech, with an auto-speak toggle for stage demos
+- **Son / daughter switch** so mom uses the right Amharic forms (ante / anchi)
+- **Live 3D background** (three.js) that reacts to the mouse and spins faster as mom gets angrier
+- **Structured AI output**: the model returns JSON (`reply`, `reply_am`, `disappointment`, `slipper`) that drives the whole UI
 - **Offline mom 📴**: 20+ hand-written replies matched by keyword. If the API key is missing, the network fails, or the model takes longer than 8 seconds, the app switches over automatically and the demo never breaks
 
 ## Demo examples
@@ -45,7 +47,8 @@ It is a comedy app, and it is also a small demonstration that persona design, co
 
 - **One file**: `index.html` with inline CSS and vanilla JavaScript. No frameworks, no build step, no backend
 - **AI**: Google Gemini API (`generateContent`) called directly from the browser, with a system instruction for the persona and `responseMimeType: "application/json"` for structured output
-- **Voice**: the browser's built-in Web Speech API (`speechSynthesis`)
+- **Voice**: Addis AI text-to-speech (Amharic, `voice/generations` API) with the browser's Web Speech API as fallback
+- **3D**: three.js from a CDN
 - **Design**: pure CSS, including the tibeb-style woven border and all animations
 - **Hosting**: any static host (Netlify drag and drop)
 
@@ -55,13 +58,13 @@ The model name is a single constant (`MODEL`) at the top of the script.
 
 - **Roasts choices, never identity.** The system prompt forbids jokes about body, looks, ethnicity, region, or religion, and bans profanity and cruelty. The humor comes from love.
 - **Serious confessions get a serious answer.** If a confession sounds like self-harm, abuse, or a crisis, mom drops the comedy completely, responds with warmth, encourages the person to talk to someone they trust, and sets disappointment to 0. The offline mode has the same safeguard.
-- **No API key in the code.** The key is pasted into a settings field and stored only in that browser's localStorage. Nothing is committed to the repository.
+- **No API keys in the code.** The Gemini and Addis AI keys are pasted into a settings field and stored only in that browser's localStorage. For a production version the keys would move behind a small server proxy. Nothing is committed to the repository.
 - **Offline fallback.** The app degrades gracefully and labels offline replies with a visible badge, so users know when they are not talking to the live model.
 - **No data collection.** No backend, no analytics, no stored conversations.
 
 ## Future work
 
-- A real Amharic voice (native text-to-speech instead of an English browser voice)
+- Amharic versions of the offline replies, so the Amharic voice works with no connection to the LLM
 - Afaan Oromoo and Tigrinya moms
 - A Telegram bot version, where Ethiopia's group chats already live
 - "Habesha Dad AI", who only says "ishi" and keeps watching the news
