@@ -1,0 +1,629 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Habesha Mom AI 👩🏾📢</title>
+<meta name="description" content="Confess. Get judged. Eat something.">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>👩🏾</text></svg>">
+<style>
+  :root {
+    --coffee: #3b2314;
+    --coffee-2: #5a3a22;
+    --cream: #fbf3e1;
+    --cream-2: #f3e6c8;
+    --gold: #d9a441;
+    --gold-dark: #a87720;
+    --green: #1f8a4c;
+    --yellow: #f4c430;
+    --red: #c8322b;
+    --ink: #2a1a0f;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; }
+  body {
+    font-family: "Trebuchet MS", "Segoe UI", system-ui, -apple-system, sans-serif;
+    font-size: 20px;
+    line-height: 1.45;
+    color: var(--ink);
+    background: var(--cream);
+    background-image: radial-gradient(circle at 20% 0%, #fff8e8 0, transparent 50%),
+                      radial-gradient(circle at 100% 100%, #f0dfb8 0, transparent 45%);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    overflow-x: hidden;
+  }
+
+  /* Tibeb-style woven border */
+  .tibeb {
+    flex: none;
+    height: 44px;
+    background-color: var(--coffee);
+    background-image:
+      linear-gradient(to bottom,
+        var(--green) 0 4px, var(--yellow) 4px 8px, var(--red) 8px 12px,
+        transparent 12px calc(100% - 12px),
+        var(--red) calc(100% - 12px) calc(100% - 8px),
+        var(--yellow) calc(100% - 8px) calc(100% - 4px),
+        var(--green) calc(100% - 4px) 100%),
+      radial-gradient(circle at 50% 50%, var(--cream) 0 2.5px, transparent 3px),
+      linear-gradient(45deg, transparent 44%, var(--gold) 44% 56%, transparent 56%),
+      linear-gradient(-45deg, transparent 44%, var(--gold) 44% 56%, transparent 56%);
+    background-size: 100% 100%, 20px 20px, 20px 20px, 20px 20px;
+    background-position: 0 0, 10px 12px, 0 12px, 0 12px;
+    background-repeat: no-repeat, repeat-x, repeat-x, repeat-x;
+  }
+
+  main {
+    flex: 1;
+    width: 100%;
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 20px 16px 28px;
+  }
+  main.shake { animation: shake .5s ease-in-out; }
+  @keyframes shake {
+    0%, 100% { transform: translate(0, 0); }
+    15% { transform: translate(-7px, 3px) rotate(-.4deg); }
+    30% { transform: translate(7px, -3px) rotate(.4deg); }
+    45% { transform: translate(-5px, 2px); }
+    60% { transform: translate(5px, -2px); }
+    80% { transform: translate(-2px, 1px); }
+  }
+
+  header { text-align: center; margin-bottom: 16px; }
+  h1 {
+    margin: 0;
+    font-family: Georgia, "Times New Roman", serif;
+    font-size: clamp(2rem, 6vw, 3.4rem);
+    color: var(--coffee);
+    letter-spacing: -.5px;
+  }
+  .subtitle {
+    margin: 4px 0 0;
+    font-size: clamp(1rem, 2.6vw, 1.35rem);
+    color: var(--gold-dark);
+    font-style: italic;
+    font-weight: bold;
+  }
+
+  .card {
+    background: #fffaf0;
+    border: 2px solid var(--cream-2);
+    border-radius: 18px;
+    box-shadow: 0 6px 20px rgba(59, 35, 20, .10);
+    padding: 16px;
+    margin-bottom: 16px;
+  }
+
+  /* Meter */
+  .meter-head {
+    display: flex; justify-content: space-between; align-items: baseline;
+    gap: 10px; flex-wrap: wrap; margin-bottom: 8px;
+  }
+  .meter-title { font-weight: bold; text-transform: uppercase; letter-spacing: 1.5px; font-size: .8rem; color: var(--coffee-2); }
+  .meter-label { font-weight: bold; font-size: clamp(1.1rem, 3.4vw, 1.6rem); color: var(--coffee); }
+  .meter-label.pop { animation: pop .45s ease-out; }
+  @keyframes pop { 0% { transform: scale(.85); } 60% { transform: scale(1.12); } 100% { transform: scale(1); } }
+  .meter-track {
+    position: relative; height: 38px; border-radius: 19px;
+    background: var(--cream-2); border: 3px solid var(--coffee); overflow: hidden;
+  }
+  .meter-fill {
+    height: 100%; width: 0%;
+    background: linear-gradient(90deg, var(--green), var(--yellow) 55%, var(--red));
+    background-size: 900px 100%;
+    transition: width 1.1s cubic-bezier(.2, .9, .25, 1.1);
+    border-radius: 0 16px 16px 0;
+  }
+  .meter-pct {
+    position: absolute; inset: 0; display: flex; align-items: center; justify-content: center;
+    font-weight: bold; color: var(--coffee); text-shadow: 0 0 6px #fff, 0 0 6px #fff;
+  }
+
+  /* Chat */
+  #chat {
+    min-height: 220px; max-height: 46vh; overflow-y: auto;
+    display: flex; flex-direction: column; gap: 14px;
+    scroll-behavior: smooth;
+  }
+  .empty { margin: auto; text-align: center; color: var(--coffee-2); opacity: .75; padding: 20px; }
+  .row { display: flex; gap: 10px; align-items: flex-end; animation: rise .3s ease-out; }
+  @keyframes rise { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: none; } }
+  .row.user { justify-content: flex-end; }
+  .avatar {
+    flex: none; width: 52px; height: 52px; border-radius: 50%;
+    background: var(--gold); border: 3px solid var(--coffee);
+    display: flex; align-items: center; justify-content: center; font-size: 30px;
+  }
+  .bubble {
+    max-width: 80%; padding: 12px 16px; border-radius: 18px;
+    font-size: clamp(1.05rem, 2.6vw, 1.4rem); overflow-wrap: anywhere;
+  }
+  .user .bubble { background: var(--coffee); color: var(--cream); border-bottom-right-radius: 4px; }
+  .mom .bubble { background: #fff; border: 2px solid var(--gold); border-bottom-left-radius: 4px; }
+  .bubble.loading { font-style: italic; color: var(--coffee-2); }
+  .dots::after { content: ""; animation: dots 1.2s steps(4, end) infinite; }
+  @keyframes dots { 0% { content: ""; } 25% { content: "."; } 50% { content: ".."; } 75% { content: "..."; } }
+  .bubble-tools { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; margin-top: 10px; }
+  .badge {
+    font-size: .75rem; font-weight: bold; padding: 3px 9px; border-radius: 999px;
+    background: var(--cream-2); color: var(--coffee-2); border: 1px solid var(--gold);
+  }
+
+  /* Controls */
+  button { font: inherit; cursor: pointer; border: none; }
+  button:focus-visible, input:focus-visible, textarea:focus-visible, summary:focus-visible {
+    outline: 3px solid var(--green); outline-offset: 2px;
+  }
+  .small-btn {
+    font-size: .85rem; font-weight: bold; padding: 6px 12px; border-radius: 999px;
+    background: var(--cream-2); color: var(--coffee); border: 2px solid var(--gold);
+    transition: transform .12s, background .12s;
+  }
+  .small-btn:hover { background: var(--gold); transform: translateY(-1px); }
+
+  .presets { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 12px; }
+  .preset {
+    font-size: .9rem; padding: 8px 14px; border-radius: 999px;
+    background: #fff; color: var(--coffee); border: 2px solid var(--gold);
+    transition: transform .12s, background .12s;
+  }
+  .preset:hover { background: var(--yellow); transform: translateY(-2px); }
+
+  textarea {
+    width: 100%; font: inherit; font-size: 1.15rem; padding: 12px 14px; resize: vertical;
+    min-height: 70px; border-radius: 14px; border: 2px solid var(--coffee-2);
+    background: #fff; color: var(--ink);
+  }
+  .confess {
+    width: 100%; margin-top: 10px; padding: 16px;
+    font-size: clamp(1.25rem, 3.6vw, 1.7rem); font-weight: bold;
+    color: var(--cream); background: linear-gradient(180deg, var(--coffee-2), var(--coffee));
+    border-radius: 16px; border-bottom: 5px solid var(--gold);
+    transition: transform .12s, filter .12s;
+  }
+  .confess:hover:not(:disabled) { transform: translateY(-2px); filter: brightness(1.15); }
+  .confess:active:not(:disabled) { transform: translateY(2px); }
+  .confess:disabled, .preset:disabled { opacity: .55; cursor: wait; }
+
+  .toolbar {
+    display: flex; flex-wrap: wrap; gap: 12px; align-items: center; justify-content: space-between;
+    margin-top: 12px; font-size: .9rem;
+  }
+  .toolbar label { display: inline-flex; align-items: center; gap: 6px; cursor: pointer; }
+  .toolbar input[type=checkbox] { width: 20px; height: 20px; accent-color: var(--green); }
+
+  details { font-size: .9rem; color: var(--coffee-2); }
+  summary { cursor: pointer; font-weight: bold; }
+  .key-row { display: flex; gap: 8px; margin-top: 10px; flex-wrap: wrap; }
+  .key-row input {
+    flex: 1; min-width: 200px; font: inherit; padding: 8px 12px;
+    border-radius: 10px; border: 2px solid var(--coffee-2); background: #fff;
+  }
+  #keyStatus { margin: 8px 0 0; }
+
+  /* Slipper */
+  .slipper {
+    position: fixed; left: 0; top: 38vh; z-index: 50; pointer-events: none;
+    font-size: clamp(90px, 16vw, 170px); line-height: 1;
+    will-change: transform;
+    animation: fly 1.3s cubic-bezier(.3, .1, .6, 1) forwards;
+  }
+  @keyframes fly {
+    0%   { transform: translate(-25vw, 20vh) rotate(0deg) scale(.6); }
+    50%  { transform: translate(45vw, -18vh) rotate(720deg) scale(1.25); }
+    100% { transform: translate(120vw, 15vh) rotate(1440deg) scale(.8); }
+  }
+
+  @media (max-width: 560px) {
+    body { font-size: 17px; }
+    .tibeb { height: 36px; }
+    .avatar { width: 42px; height: 42px; font-size: 24px; }
+    .bubble { max-width: 86%; }
+    #chat { max-height: 42vh; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    main.shake { animation: none; }
+    .slipper { animation-duration: 2s; }
+  }
+</style>
+</head>
+<body>
+<div class="tibeb" aria-hidden="true"></div>
+
+<main id="app">
+  <header>
+    <h1>Habesha Mom AI 👩🏾📢</h1>
+    <p class="subtitle">Confess. Get judged. Eat something.</p>
+  </header>
+
+  <section class="card" aria-label="Disappointment meter">
+    <div class="meter-head">
+      <span class="meter-title">Disappointment Meter</span>
+      <span class="meter-label" id="meterLabel" aria-live="polite">Proud mom 🥹</span>
+    </div>
+    <div class="meter-track" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" id="meterTrack">
+      <div class="meter-fill" id="meterFill"></div>
+      <div class="meter-pct" id="meterPct">0%</div>
+    </div>
+  </section>
+
+  <section class="card">
+    <div id="chat" aria-live="polite">
+      <p class="empty" id="empty">Mom is waiting. She already knows. Just confess. ☕</p>
+    </div>
+  </section>
+
+  <section class="card">
+    <div class="presets" id="presets"></div>
+    <form id="form">
+      <textarea id="input" maxlength="500" placeholder="Yene lij, what did you do this time?" aria-label="Your confession"></textarea>
+      <button class="confess" id="confessBtn" type="submit">Confess to Mom 🙏</button>
+    </form>
+    <div class="toolbar">
+      <label><input type="checkbox" id="autoSpeak"> 🔊 Auto-speak mom's reply</label>
+      <button class="small-btn" id="clearBtn" type="button">🧹 Clear chat</button>
+    </div>
+  </section>
+
+  <section class="card">
+    <details id="settings">
+      <summary>⚙️ Settings (Gemini API key)</summary>
+      <div class="key-row">
+        <input type="password" id="keyInput" placeholder="Paste your Gemini API key" autocomplete="off" aria-label="Gemini API key">
+        <button class="small-btn" id="saveKey" type="button">Save</button>
+        <button class="small-btn" id="removeKey" type="button">Remove</button>
+      </div>
+      <p id="keyStatus"></p>
+      <p>The key stays in this browser only (localStorage). Without a key, offline mom 📴 answers.</p>
+    </details>
+  </section>
+</main>
+
+<div class="tibeb" aria-hidden="true"></div>
+
+<script>
+// ====== CONFIG (change the model here) ======
+const MODEL = "gemini-2.5-flash";
+const API_TIMEOUT_MS = 8000;
+const KEY_STORAGE = "habeshaMomGeminiKey";
+const SPEAK_STORAGE = "habeshaMomAutoSpeak";
+
+const SYSTEM_PROMPT = `You are a loving but extremely dramatic Ethiopian mother. Your child has just confessed something to you. React like a real Habesha mom.
+
+Personality:
+- Deeply loving, but you express love through guilt, drama, and worry.
+- You ALWAYS compare them to the neighbor's child (for example: "Tsehay's son is a doctor at Tikur Anbessa", "Almaz's daughter got a scholarship to America").
+- You remind them of your sacrifices ("I sold my gold for your school fees", "I carried you for nine months").
+- You threaten to tell their father, call their aunt, or announce it at the next coffee ceremony.
+- You believe only doctor, engineer, or pilot are real careers.
+- No matter what, you end by caring about them, usually asking if they have eaten.
+
+Language:
+- Write mostly in English so an audience understands, but mix in Amharic phrases written in Latin letters, such as: "Ere bakih", "Wey gud!", "Yene lij", "Beka!", "Ere tew", "Egziabher yibarkih", "Min honeh?", "Ishi".
+- Use "ante" when talking to a boy and "anchi" for a girl. If the gender is unknown, use "yene lij" (my child).
+
+Rules:
+- Keep replies to 2-4 sentences. Punchy, theatrical, funny.
+- Roast their CHOICES, never their body, looks, ethnicity, region, or religion.
+- No profanity, nothing cruel or humiliating.
+- If the confession sounds genuinely serious (self-harm, abuse, crisis), drop the comedy completely, respond with real warmth, and gently encourage them to talk to someone they trust. Set disappointment to 0.
+- Return ONLY JSON: {"reply": "...", "disappointment": 0-100, "slipper": true/false}. Use slipper: true only for truly outrageous confessions.`;
+
+const PRESETS = [
+  "I failed my math exam",
+  "I want to be a TikToker",
+  "I spent 9 hours on my phone today",
+  "I want to study art instead of medicine",
+  "I have a girlfriend/boyfriend",
+  "I didn't eat breakfast"
+];
+
+const LOADING_MESSAGES = [
+  "Mom is typing",
+  "Mom is calling your aunt",
+  "Mom is telling the neighbors",
+  "Mom is looking for the slipper"
+];
+
+// ====== OFFLINE MOM ======
+const OFFLINE = [
+  { keys: ["math", "exam", "grade", "fail", "test", "school", "homework"], replies: [
+    { reply: "Wey gud! You failed?! Tsehay's son is a doctor at Tikur Anbessa and he never failed even a blood test. I sold my gold for your school fees, yene lij. Come, sit, eat something, then we study until morning.", disappointment: 88 },
+    { reply: "Ere bakih! In my time I walked two hours to school with no shoes and I was first in the class. Wait until your father hears this at dinner. Now eat your injera, the brain cannot work when it is empty.", disappointment: 82 },
+    { reply: "Min honeh, yene lij? Almaz's daughter got a scholarship to America and you bring me this? Beka, I am announcing it at the next coffee ceremony. But first, did you eat?", disappointment: 91 }
+  ]},
+  { keys: ["tiktok", "youtube", "influencer", "streamer", "content creator", "famous", "instagram"], replies: [
+    { reply: "TikToker?! Ere tew! I carried you for nine months so you can dance for strangers on a phone? Only doctor, engineer, or pilot, yene lij. Choose one and then come eat.", disappointment: 95, slipper: true },
+    { reply: "Wey gud! What will I tell the neighbors, that my child is an 'influencer'? Tsehay's son influences people too, he is a DOCTOR, he influences them to stay alive. Beka. Have you eaten today?", disappointment: 93, slipper: true },
+    { reply: "Ere bakih, yene lij. Can the YouTube pay for my knee surgery? I am calling your aunt in Washington DC right now. Sit down and eat while I dial.", disappointment: 90 }
+  ]},
+  { keys: ["phone", "screen", "hours", "game", "gaming", "netflix", "scroll"], replies: [
+    { reply: "Nine hours on the phone?! Wey gud! In nine hours Almaz's daughter finished her homework, cooked doro wot, and got a scholarship. Give me that phone, yene lij, and go eat something.", disappointment: 78 },
+    { reply: "Ere bakih! Your eyes will become square like that phone. When I was your age my screen was the window, and I watched the goats. Beka, put it down and come drink some shai.", disappointment: 72 },
+    { reply: "Min honeh? The phone is your mother now? Did the phone carry you for nine months? Ishi, ask the phone to make you dinner. ...Come, the food is getting cold.", disappointment: 80 }
+  ]},
+  { keys: ["art", "music", "paint", "draw", "sing", "dance", "actor", "film", "poet", "writer", "design"], replies: [
+    { reply: "Art instead of medicine?! Ere tew! You can draw the heart AFTER you become a heart surgeon. I sold my gold for your school fees, yene lij. Now eat, artists are always hungry and now I know why.", disappointment: 89 },
+    { reply: "Wey gud! Tsehay's son is a doctor at Tikur Anbessa and my child wants to paint? Ishi, paint me a picture of your father's face when I tell him. But eat first, you look thin.", disappointment: 86 },
+    { reply: "Yene lij, music is a beautiful hobby. For a PILOT. On his day off. I am mentioning this at the coffee ceremony and everyone will pray for you. Have you eaten?", disappointment: 84 }
+  ]},
+  { keys: ["girlfriend", "boyfriend", "dating", "date", "crush", "love", "relationship", "married", "marry"], replies: [
+    { reply: "A WHAT?! Ere bakih! You have no degree but you have a relationship? Finish your masters, then your PhD, then we talk at age thirty-five. Wait until your father hears. ...Is this person eating well at least?", disappointment: 92, slipper: true },
+    { reply: "Wey gud! Who are their parents? What do they study? Is it medicine? Bring them Sunday, I will make doro wot and ask only forty questions. Beka, yene lij, and you, did you eat?", disappointment: 75 },
+    { reply: "Min honeh, yene lij? Books are your girlfriend. Books are your boyfriend. I am calling your aunt, she will be on the next flight. Now come and eat before I faint.", disappointment: 90 }
+  ]},
+  { keys: ["eat", "ate", "food", "breakfast", "lunch", "dinner", "hungry", "diet", "injera"], replies: [
+    { reply: "You did NOT eat?! Wey gud! This is worse than failing an exam. People will say I do not feed my child, yene lij. Sit down right now, I am bringing injera, and you will not stand until the plate is clean.", disappointment: 70 },
+    { reply: "Ere bakih! No breakfast? Do you want to disappear? I woke up at five to make firfir and you walked past it like a stranger. Come. Eat. Then eat again.", disappointment: 68 },
+    { reply: "Min honeh? You are skin and wind! Tsehay's son eats three times a day and look, he is a doctor. Beka, no more talking, open your mouth, here comes the gursha.", disappointment: 65 }
+  ]}
+];
+
+const OFFLINE_GENERIC = [
+  { reply: "Wey gud! Is this why I carried you for nine months? Tsehay's son is a doctor at Tikur Anbessa and he calls his mother every single day. Ishi, yene lij, we will talk about it. Have you eaten?", disappointment: 74 },
+  { reply: "Ere bakih, yene lij! I left my whole country for you and this is the news you bring me? I am telling your father the moment he finishes the news. Come, sit, eat something first.", disappointment: 79 },
+  { reply: "Min honeh? Almaz's daughter got a scholarship to America and she never confesses anything because she does nothing wrong. Beka. I forgive you, but the coffee ceremony will hear about this. Did you eat?", disappointment: 83 },
+  { reply: "Ere tew! My blood pressure, yene lij, my blood pressure! I sold my gold for your school fees, remember that. Egziabher yibarkih, now go wash your hands and come eat.", disappointment: 77 },
+  { reply: "Hmm. Ishi. That is... actually not so bad, yene lij. Egziabher yibarkih. But do not get comfortable, Tsehay's son is still a doctor. Now come eat, I made your favorite.", disappointment: 22 }
+];
+
+const SERIOUS_WORDS = ["suicide", "suicidal", "kill myself", "end my life", "want to die", "self harm", "self-harm",
+  "hurt myself", "cutting myself", "abuse", "abused", "abusing", "assault", "raped", "rape", "hits me", "beats me",
+  "depressed", "depression", "hopeless", "no reason to live"];
+const SERIOUS_REPLY = "Yene lij, come here. I am not joking now. Thank you for telling me, that took courage, and I love you no matter what. Please talk to someone you trust today, a family member, a friend, a doctor or a counselor, and if you are in danger, call your local emergency number. You are not alone.";
+
+function offlineMom(text) {
+  const t = text.toLowerCase();
+  if (SERIOUS_WORDS.some(w => t.includes(w))) {
+    return { reply: SERIOUS_REPLY, disappointment: 0, slipper: false, offline: true };
+  }
+  const group = OFFLINE.find(g => g.keys.some(k => t.includes(k)));
+  const pool = group ? group.replies : OFFLINE_GENERIC;
+  const pick = pool[Math.floor(Math.random() * pool.length)];
+  return { reply: pick.reply, disappointment: pick.disappointment, slipper: !!pick.slipper, offline: true };
+}
+
+// ====== STORAGE (safe) ======
+function storeGet(k) { try { return localStorage.getItem(k) || ""; } catch (e) { return ""; } }
+function storeSet(k, v) { try { localStorage.setItem(k, v); return true; } catch (e) { return false; } }
+function storeDel(k) { try { localStorage.removeItem(k); } catch (e) {} }
+
+let apiKey = storeGet(KEY_STORAGE);
+
+// ====== GEMINI ======
+function parseMomJson(raw) {
+  let obj;
+  try { obj = JSON.parse(raw); }
+  catch (e) {
+    const m = String(raw).match(/\{[\s\S]*\}/);
+    if (!m) throw new Error("No JSON in response");
+    obj = JSON.parse(m[0]);
+  }
+  if (!obj || typeof obj.reply !== "string" || !obj.reply.trim()) throw new Error("Bad reply shape");
+  let d = Number(obj.disappointment);
+  if (!isFinite(d)) d = 50;
+  d = Math.max(0, Math.min(100, Math.round(d)));
+  return { reply: obj.reply.trim(), disappointment: d, slipper: obj.slipper === true, offline: false };
+}
+
+async function askGemini(text) {
+  const url = "https://generativelanguage.googleapis.com/v1beta/models/" +
+    encodeURIComponent(MODEL) + ":generateContent?key=" + encodeURIComponent(apiKey);
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), API_TIMEOUT_MS);
+  try {
+    const res = await fetch(url, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      signal: controller.signal,
+      body: JSON.stringify({
+        systemInstruction: { parts: [{ text: SYSTEM_PROMPT }] },
+        contents: [{ role: "user", parts: [{ text: text }] }],
+        generationConfig: { responseMimeType: "application/json", temperature: 1.1 }
+      })
+    });
+    if (!res.ok) throw new Error("HTTP " + res.status);
+    const data = await res.json();
+    const parts = data && data.candidates && data.candidates[0] && data.candidates[0].content &&
+      data.candidates[0].content.parts;
+    const raw = (parts || []).map(p => p.text || "").join("");
+    if (!raw) throw new Error("Empty response");
+    return parseMomJson(raw);
+  } finally {
+    clearTimeout(timer);
+  }
+}
+
+async function getMomReply(text) {
+  if (!apiKey) return offlineMom(text);
+  try { return await askGemini(text); }
+  catch (e) { console.warn("Gemini failed, using offline mom:", e && e.message); return offlineMom(text); }
+}
+
+// ====== UI ======
+const $ = id => document.getElementById(id);
+const chat = $("chat"), input = $("input"), confessBtn = $("confessBtn"), app = $("app");
+let busy = false;
+
+function scrollChat() { chat.scrollTop = chat.scrollHeight; }
+
+function addRow(who) {
+  const empty = $("empty");
+  if (empty) empty.remove();
+  const row = document.createElement("div");
+  row.className = "row " + who;
+  if (who === "mom") {
+    const av = document.createElement("div");
+    av.className = "avatar";
+    av.textContent = "👩🏾";
+    av.setAttribute("aria-label", "Mom");
+    row.appendChild(av);
+  }
+  const bubble = document.createElement("div");
+  bubble.className = "bubble";
+  row.appendChild(bubble);
+  chat.appendChild(row);
+  return bubble;
+}
+
+function meterLabel(d) {
+  if (d <= 30) return "Proud mom 🥹";
+  if (d <= 60) return "Mildly concerned 😐";
+  if (d <= 89) return "Calling your father 📞";
+  return "SLIPPER INCOMING 🩴";
+}
+
+function setMeter(d) {
+  $("meterFill").style.width = d + "%";
+  $("meterPct").textContent = d + "%";
+  $("meterTrack").setAttribute("aria-valuenow", d);
+  const label = $("meterLabel");
+  label.textContent = meterLabel(d);
+  label.classList.remove("pop");
+  void label.offsetWidth;
+  label.classList.add("pop");
+}
+
+function throwSlipper() {
+  const s = document.createElement("div");
+  s.className = "slipper";
+  s.textContent = "🩴";
+  s.setAttribute("aria-hidden", "true");
+  document.body.appendChild(s);
+  s.addEventListener("animationend", () => s.remove());
+  setTimeout(() => s.remove(), 3000);
+  app.classList.remove("shake");
+  void app.offsetWidth;
+  setTimeout(() => app.classList.add("shake"), 450);
+}
+
+function speak(text) {
+  if (!("speechSynthesis" in window)) return;
+  try {
+    window.speechSynthesis.cancel();
+    const clean = text.replace(/[\u{1F000}-\u{1FAFF}\u{2600}-\u{27BF}\u{FE0F}\u{200D}]/gu, "");
+    const u = new SpeechSynthesisUtterance(clean);
+    u.pitch = 0.85;
+    u.rate = 0.95;
+    u.lang = "en-US";
+    window.speechSynthesis.speak(u);
+  } catch (e) {}
+}
+
+function setBusy(b) {
+  busy = b;
+  confessBtn.disabled = b;
+  document.querySelectorAll(".preset").forEach(el => { el.disabled = b; });
+}
+
+async function confess(text) {
+  text = (text || "").trim();
+  if (!text || busy) return;
+  setBusy(true);
+  input.value = "";
+
+  addRow("user").textContent = text;
+  const bubble = addRow("mom");
+  bubble.classList.add("loading");
+  const msg = document.createElement("span");
+  msg.className = "dots";
+  bubble.appendChild(msg);
+  let i = 0;
+  msg.textContent = LOADING_MESSAGES[0];
+  const rot = setInterval(() => { i = (i + 1) % LOADING_MESSAGES.length; msg.textContent = LOADING_MESSAGES[i]; }, 1300);
+  scrollChat();
+
+  const started = Date.now();
+  let result;
+  try { result = await getMomReply(text); }
+  catch (e) { result = offlineMom(text); }
+  // Keep the suspense for at least a moment so the loading joke lands
+  const wait = 1100 - (Date.now() - started);
+  if (wait > 0) await new Promise(r => setTimeout(r, wait));
+  clearInterval(rot);
+
+  bubble.classList.remove("loading");
+  bubble.textContent = "";
+  const p = document.createElement("div");
+  p.textContent = result.reply;
+  bubble.appendChild(p);
+
+  const tools = document.createElement("div");
+  tools.className = "bubble-tools";
+  const sp = document.createElement("button");
+  sp.type = "button";
+  sp.className = "small-btn";
+  sp.textContent = "🔊 Read it out loud";
+  sp.addEventListener("click", () => speak(result.reply));
+  tools.appendChild(sp);
+  if (result.offline) {
+    const b = document.createElement("span");
+    b.className = "badge";
+    b.textContent = "offline mom 📴";
+    tools.appendChild(b);
+  }
+  bubble.appendChild(tools);
+
+  setMeter(result.disappointment);
+  if (result.slipper || result.disappointment >= 90) throwSlipper();
+  if ($("autoSpeak").checked) speak(result.reply);
+  scrollChat();
+  setBusy(false);
+}
+
+// Presets
+PRESETS.forEach(t => {
+  const b = document.createElement("button");
+  b.type = "button";
+  b.className = "preset";
+  b.textContent = t;
+  b.addEventListener("click", () => confess(t));
+  $("presets").appendChild(b);
+});
+
+$("form").addEventListener("submit", e => { e.preventDefault(); confess(input.value); });
+input.addEventListener("keydown", e => {
+  if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); confess(input.value); }
+});
+
+$("clearBtn").addEventListener("click", () => {
+  if ("speechSynthesis" in window) { try { window.speechSynthesis.cancel(); } catch (e) {} }
+  chat.textContent = "";
+  const p = document.createElement("p");
+  p.className = "empty";
+  p.id = "empty";
+  p.textContent = "Mom is waiting. She already knows. Just confess. ☕";
+  chat.appendChild(p);
+  setMeter(0);
+});
+
+// Settings
+function showKeyStatus(note) {
+  $("keyStatus").textContent = note || (apiKey
+    ? "✅ Key saved. Live mom is on (" + MODEL + ")."
+    : "📴 No key. Offline mom is on.");
+}
+$("saveKey").addEventListener("click", () => {
+  const v = $("keyInput").value.trim();
+  if (!v) { showKeyStatus("Paste a key first, yene lij."); return; }
+  apiKey = v;
+  const ok = storeSet(KEY_STORAGE, v);
+  $("keyInput").value = "";
+  showKeyStatus(ok ? "" : "✅ Key set for this session (browser storage is blocked).");
+});
+$("removeKey").addEventListener("click", () => {
+  apiKey = "";
+  storeDel(KEY_STORAGE);
+  $("keyInput").value = "";
+  showKeyStatus();
+});
+$("autoSpeak").checked = storeGet(SPEAK_STORAGE) === "1";
+$("autoSpeak").addEventListener("change", e => storeSet(SPEAK_STORAGE, e.target.checked ? "1" : "0"));
+showKeyStatus();
+if (!apiKey) $("settings").open = true;
+</script>
+</body>
+</html>
