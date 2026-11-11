@@ -3,9 +3,9 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Habesha Mom AI 👩🏾📢</title>
+<title>Habesha Mom AI</title>
 <meta name="description" content="Confess. Get judged. Eat something.">
-<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>👩🏾</text></svg>">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><circle cx='50' cy='50' r='46' fill='%23d9a441'/><circle cx='50' cy='56' r='27' fill='%238d5a2b'/><path d='M15 62C12 30 28 10 50 10s38 20 35 52C81 42 68 32 50 32S19 42 15 62z' fill='%23fbf3e1'/></svg>">
 <style>
   :root {
     --coffee: #3b2314;
@@ -97,6 +97,8 @@
     margin-bottom: 16px;
   }
 
+  .ic { width: 1.15em; height: 1.15em; vertical-align: -.2em; display: inline-block; }
+  .avatar .ic { width: 44px; height: 44px; vertical-align: 0; }
   /* Meter */
   .meter-head {
     display: flex; justify-content: space-between; align-items: baseline;
@@ -231,18 +233,32 @@
 </style>
 </head>
 <body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>
+<symbol id="i-mom" viewBox="0 0 24 24"><circle cx="12" cy="13.5" r="6.5" fill="#8d5a2b"/><path d="M3.5 15C3 7 6.5 2.5 12 2.5S21 7 20.5 15c-1-5-4-7.5-8.5-7.5S4.500 10 3.500 15z" fill="#fbf3e1" stroke="#d9a441" stroke-width="1.2"/><circle cx="9.700" cy="13" r="1" fill="#2a1a0f"/><circle cx="14.300" cy="13" r="1" fill="#2a1a0f"/><path d="M9.500 16.200q2.500 2 5 0" fill="none" stroke="#2a1a0f" stroke-width="1.200" stroke-linecap="round"/></symbol>
+<symbol id="i-horn" viewBox="0 0 24 24"><path d="M3 10v4h3l8 5V5l-8 5H3z" fill="#c8322b"/><path d="M17 9a4 4 0 010 6M19.500 6.500a8 8 0 010 11" fill="none" stroke="#d9a441" stroke-width="2" stroke-linecap="round"/></symbol>
+<symbol id="i-speak" viewBox="0 0 24 24"><path d="M4 9v6h4l5 4V5L8 9H4z" fill="currentColor"/><path d="M16 9a4 4 0 010 6M18.500 6.500a8 8 0 010 11" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></symbol>
+<symbol id="i-pray" viewBox="0 0 24 24"><path d="M12 2.500l-4.500 9v6.500L12 21.500l4.500-3.500v-6.500z" fill="#d9a441"/><path d="M12 2.500v19" stroke="#3b2314" stroke-width="1.400"/></symbol>
+<symbol id="i-proud" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" fill="#f4c430"/><path d="M7 10q1.500-2 3 0M14 10q1.500-2 3 0M7 14q5 5.500 10 0" fill="none" stroke="#3b2314" stroke-width="1.700" stroke-linecap="round"/></symbol>
+<symbol id="i-meh" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" fill="#f4c430"/><circle cx="8.500" cy="10" r="1.300" fill="#3b2314"/><circle cx="15.500" cy="10" r="1.300" fill="#3b2314"/><path d="M8 15.500h8" stroke="#3b2314" stroke-width="1.700" stroke-linecap="round"/></symbol>
+<symbol id="i-phone" viewBox="0 0 24 24"><path fill="#1f8a4c" d="M22 16.920v3a2 2 0 0 1-2.180 2 19.790 19.790 0 0 1-8.630-3.070 19.500 19.500 0 0 1-6-6 19.790 19.790 0 0 1-3.070-8.670A2 2 0 0 1 4.110 2h3a2 2 0 0 1 2 1.720 12.840 12.840 0 0 0 .7 2.810 2 2 0 0 1-.450 2.110L8.090 9.910a16 16 0 0 0 6 6l1.270-1.270a2 2 0 0 1 2.110-.450 12.840 12.840 0 0 0 2.810.7A2 2 0 0 1 22 16.920z"/></symbol>
+<symbol id="i-slipper" viewBox="0 0 24 24"><path d="M12 1.500c3.500 0 5.500 3 5.500 7 0 3-1.200 5-1.200 8 0 3.500-1.800 6-4.300 6s-4.300-2.500-4.300-6c0-3-1.200-5-1.200-8 0-4 2-7 5.500-7z" fill="#c8322b" stroke="#3b2314" stroke-width="1"/><path d="M7.500 11.500L12 6l4.500 5.500" fill="none" stroke="#f4c430" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+<symbol id="i-off" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9" fill="none" stroke="currentColor" stroke-width="2"/><path d="M5.500 5.500l13 13" stroke="currentColor" stroke-width="2"/></symbol>
+<symbol id="i-trash" viewBox="0 0 24 24"><path d="M4 7h16M9 7V4h6v3M6 7l1 13h10l1-13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+<symbol id="i-gear" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3.500" fill="none" stroke="currentColor" stroke-width="2"/><path d="M12 2v4M12 18v4M2 12h4M18 12h4M5 5l2.800 2.800M16.200 16.200L19 19M5 19l2.800-2.800M16.200 7.800L19 5" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></symbol>
+<symbol id="i-coffee" viewBox="0 0 24 24"><path d="M4 10h13v5a5 5 0 01-5 5H9a5 5 0 01-5-5z" fill="#5a3a22"/><path d="M17 12h1.500a2 2 0 010 4H17M8 3v3.500M12 3v3.500" fill="none" stroke="#5a3a22" stroke-width="1.800" stroke-linecap="round"/></symbol>
+</defs></svg>
 <div class="tibeb" aria-hidden="true"></div>
 
 <main id="app">
   <header>
-    <h1>Habesha Mom AI 👩🏾📢</h1>
+    <h1>Habesha Mom AI <svg class="ic" aria-hidden="true"><use href="#i-mom"/></svg><svg class="ic" aria-hidden="true"><use href="#i-horn"/></svg></h1>
     <p class="subtitle">Confess. Get judged. Eat something.</p>
   </header>
 
   <section class="card" aria-label="Disappointment meter">
     <div class="meter-head">
       <span class="meter-title">Disappointment Meter</span>
-      <span class="meter-label" id="meterLabel" aria-live="polite">Proud mom 🥹</span>
+      <span class="meter-label" id="meterLabel" aria-live="polite">Proud mom <svg class="ic" aria-hidden="true"><use href="#i-proud"/></svg></span>
     </div>
     <div class="meter-track" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" id="meterTrack">
       <div class="meter-fill" id="meterFill"></div>
@@ -252,7 +268,7 @@
 
   <section class="card">
     <div id="chat" aria-live="polite">
-      <p class="empty" id="empty">Mom is waiting. She already knows. Just confess. ☕</p>
+      <p class="empty" id="empty">Mom is waiting. She already knows. Just confess. <svg class="ic" aria-hidden="true"><use href="#i-coffee"/></svg></p>
     </div>
   </section>
 
@@ -260,24 +276,24 @@
     <div class="presets" id="presets"></div>
     <form id="form">
       <textarea id="input" maxlength="500" placeholder="Yene lij, what did you do this time?" aria-label="Your confession"></textarea>
-      <button class="confess" id="confessBtn" type="submit">Confess to Mom 🙏</button>
+      <button class="confess" id="confessBtn" type="submit">Confess to Mom <svg class="ic" aria-hidden="true"><use href="#i-pray"/></svg></button>
     </form>
     <div class="toolbar">
-      <label><input type="checkbox" id="autoSpeak"> 🔊 Auto-speak mom's reply</label>
-      <button class="small-btn" id="clearBtn" type="button">🧹 Clear chat</button>
+      <label><input type="checkbox" id="autoSpeak"> <svg class="ic" aria-hidden="true"><use href="#i-speak"/></svg> Auto-speak mom's reply</label>
+      <button class="small-btn" id="clearBtn" type="button"><svg class="ic" aria-hidden="true"><use href="#i-trash"/></svg> Clear chat</button>
     </div>
   </section>
 
   <section class="card">
     <details id="settings">
-      <summary>⚙️ Settings (Gemini API key)</summary>
+      <summary><svg class="ic" aria-hidden="true"><use href="#i-gear"/></svg> Settings (Gemini API key)</summary>
       <div class="key-row">
         <input type="password" id="keyInput" placeholder="Paste your Gemini API key" autocomplete="off" aria-label="Gemini API key">
         <button class="small-btn" id="saveKey" type="button">Save</button>
         <button class="small-btn" id="removeKey" type="button">Remove</button>
       </div>
       <p id="keyStatus"></p>
-      <p>The key stays in this browser only (localStorage). Without a key, offline mom 📴 answers.</p>
+      <p>The key stays in this browser only (localStorage). Without a key, offline mom answers.</p>
     </details>
   </section>
 </main>
@@ -444,6 +460,7 @@ async function getMomReply(text) {
 }
 
 // ====== UI ======
+const ic = n => '<svg class="ic" aria-hidden="true"><use href="#i-' + n + '"/></svg>';
 const $ = id => document.getElementById(id);
 const chat = $("chat"), input = $("input"), confessBtn = $("confessBtn"), app = $("app");
 let busy = false;
@@ -458,7 +475,7 @@ function addRow(who) {
   if (who === "mom") {
     const av = document.createElement("div");
     av.className = "avatar";
-    av.textContent = "👩🏾";
+    av.innerHTML = ic("mom");
     av.setAttribute("aria-label", "Mom");
     row.appendChild(av);
   }
@@ -470,10 +487,10 @@ function addRow(who) {
 }
 
 function meterLabel(d) {
-  if (d <= 30) return "Proud mom 🥹";
-  if (d <= 60) return "Mildly concerned 😐";
-  if (d <= 89) return "Calling your father 📞";
-  return "SLIPPER INCOMING 🩴";
+  if (d <= 30) return "Proud mom " + ic("proud");
+  if (d <= 60) return "Mildly concerned " + ic("meh");
+  if (d <= 89) return "Calling your father " + ic("phone");
+  return "SLIPPER INCOMING " + ic("slipper");
 }
 
 function setMeter(d) {
@@ -481,7 +498,7 @@ function setMeter(d) {
   $("meterPct").textContent = d + "%";
   $("meterTrack").setAttribute("aria-valuenow", d);
   const label = $("meterLabel");
-  label.textContent = meterLabel(d);
+  label.innerHTML = meterLabel(d);
   label.classList.remove("pop");
   void label.offsetWidth;
   label.classList.add("pop");
@@ -490,7 +507,7 @@ function setMeter(d) {
 function throwSlipper() {
   const s = document.createElement("div");
   s.className = "slipper";
-  s.textContent = "🩴";
+  s.innerHTML = ic("slipper");
   s.setAttribute("aria-hidden", "true");
   document.body.appendChild(s);
   s.addEventListener("animationend", () => s.remove());
@@ -556,13 +573,13 @@ async function confess(text) {
   const sp = document.createElement("button");
   sp.type = "button";
   sp.className = "small-btn";
-  sp.textContent = "🔊 Read it out loud";
+  sp.innerHTML = ic("speak") + " Read it out loud";
   sp.addEventListener("click", () => speak(result.reply));
   tools.appendChild(sp);
   if (result.offline) {
     const b = document.createElement("span");
     b.className = "badge";
-    b.textContent = "offline mom 📴";
+    b.innerHTML = "offline mom " + ic("off");
     tools.appendChild(b);
   }
   bubble.appendChild(tools);
@@ -595,7 +612,7 @@ $("clearBtn").addEventListener("click", () => {
   const p = document.createElement("p");
   p.className = "empty";
   p.id = "empty";
-  p.textContent = "Mom is waiting. She already knows. Just confess. ☕";
+  p.innerHTML = "Mom is waiting. She already knows. Just confess. " + ic("coffee");
   chat.appendChild(p);
   setMeter(0);
 });
@@ -603,8 +620,8 @@ $("clearBtn").addEventListener("click", () => {
 // Settings
 function showKeyStatus(note) {
   $("keyStatus").textContent = note || (apiKey
-    ? "✅ Key saved. Live mom is on (" + MODEL + ")."
-    : "📴 No key. Offline mom is on.");
+    ? "Key saved. Live mom is on (" + MODEL + ")."
+    : "No key. Offline mom is on.");
 }
 $("saveKey").addEventListener("click", () => {
   const v = $("keyInput").value.trim();
@@ -612,7 +629,7 @@ $("saveKey").addEventListener("click", () => {
   apiKey = v;
   const ok = storeSet(KEY_STORAGE, v);
   $("keyInput").value = "";
-  showKeyStatus(ok ? "" : "✅ Key set for this session (browser storage is blocked).");
+  showKeyStatus(ok ? "" : "Key set for this session (browser storage is blocked).");
 });
 $("removeKey").addEventListener("click", () => {
   apiKey = "";

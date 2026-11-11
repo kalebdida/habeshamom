@@ -1,4 +1,4 @@
-# Habesha Mom AI 👩🏾📢
+# Habesha Mom AI
 
 **Confess. Get judged. Eat something.**
 
